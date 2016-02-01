@@ -13,8 +13,16 @@ is that Wikispeed uses a logarithmic scale in the gauge charts,
 which allows for a better visualization of the wide range of editing rates
 of the various projects. (See https://github.com/edsu/wikipulse/issues/13)
 
-# Credits / thanks:
+## Credits / thanks:
 - Ed Summers for [Wikipulse](http://wikipulse.herokuapp.com/)
 - Krinkle for the [RCFeed demo code](http://codepen.io/Krinkle/pen/laucI/)
 - WMF devs for providing the [RCFeed](https://www.mediawiki.org/wiki/API:Recent_changes_stream) service
 - HighCharts for their wonderful [charts library](http://www.highcharts.com/)
+
+## See also
+You might be interested in these similar projects
+that also visualize real-time edits to Wikimedia projects:
+
+- [Wikistream](http://wikistream.wmflabs.org/)
+- [Listen to Wikipedia](http://listen.hatnote.com/)
+- [Recent Changes map](http://rcmap.hatnote.com/) and [Wikipedia Vision](http://www.lkozma.net/wpv/)
