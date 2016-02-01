@@ -1,0 +1,233 @@
+<!--
+Original source: http://codepen.io/Krinkle/pen/laucI/
+
+TODO
+- Dual scales (edits per minute, edits per second): http://jsfiddle.net/highcharts/EjRLw/
+- Reduce font size for smaller gauges
+- Make large gauge's color bands thicker
+- remove border for number, perhaps grow and reposition it
+- maybe change to the solidgauge type (makes each gauge's current value more evident,
+  and leaves space in the middle for the number)
+- split html from css and javascript
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Wikispeed</title>
+    <style>
+        body { font-family: sans-serif; }
+        h1 { text-align: center; margin-top: 1.5rem; }
+        p#about { width: 80%; line-height: 1.5em; margin: 0 auto; text-align: center; }
+        hr { width: 50%; border: none; height: 1px; background-color: silver; margin: 1rem auto; }
+        .gauge { float: left; width: 15rem; height: 15rem; margin-bottom: 1rem;}
+        .gauge#global{ width: 30rem; height: 31rem; } /* twice the size of the small ones, for proper wrapping / alignment */
+    </style>
+    <!--Latest socket.io version doesn't work, see https://phabricator.wikimedia.org/T68232 -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.17/socket.io.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script><!-- Needed for the logarithmic gauge charts -->
+</head>
+<body>
+    <h1>Wikispeed</h1>
+    <p id="about">
+        This is a visualization of the rate of edits to Wikipedia in various languages.<br/>
+        It's essentially a replica of the original
+        <b><a href="http://wikipulse.herokuapp.com/">Wikipulse</a></b>
+        created in 2011 by <a href="http://mith.umd.edu/people/person/ed-summers/">Ed Summers</a>,<br/>
+        but using the new
+        <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">Recent Changes stream</a>
+        released in 2014<!--
+        over <a href="https://en.wikipedia.org/wiki/WebSocket">websockets</a>,
+        instead of the old
+        <a href="https://meta.wikimedia.org/wiki/IRC/Channels#Recent_changes">IRC feed</a>,
+        which allows for a more convenient and completely server-less setup-->.
+        Learn more about the project <a href="https://github.com/waldyrious/wikispeed">here</a>.
+    </p>
+    <hr/>
+    <div class="gauge" id="global" title="All Wikipedias"></div>
+    <!-- List of dbnames: https://noc.wikimedia.org/conf/highlight.php?file=all.dblist -->
+    <!-- Edit stats from: http://stats.wikimedia.org/EN/TablesDatabaseEdits.htm (100k+) -->
+    <!-- Size stats from: https://meta.wikimedia.org/wiki/List_of_Wikipedias (100k+) -->
+    <div class="gauge" id="arwiki" title="Arabic" lang="العربية"></div>
+    <div class="gauge" id="zhwiki" title="Chinese" lang="中文"></div>
+    <div class="gauge" id="nlwiki" title="Dutch" lang="Nederlands"></div>
+    <div class="gauge" id="enwiki" title="English" lang="English"></div>
+    <div class="gauge" id="frwiki" title="French" lang="Français"></div>
+    <div class="gauge" id="dewiki" title="German" lang="Deutsch"></div>
+    <div class="gauge" id="itwiki" title="Italian" lang="Italiano"></div>
+    <div class="gauge" id="jawiki" title="Japanese" lang="日本語"></div>
+    <div class="gauge" id="kowiki" title="Korean" lang="한국어"></div>
+    <div class="gauge" id="nowiki" title="Norwegian" lang="Norsk (Bokmål)"></div>
+    <div class="gauge" id="plwiki" title="Polish" lang="Polski"></div>
+    <div class="gauge" id="ptwiki" title="Portuguese" lang="Português"></div>
+    <div class="gauge" id="ruwiki" title="Russian" lang="Русский"></div>
+    <div class="gauge" id="eswiki" title="Spanish" lang="Español"></div>
+    <div class="gauge" id="svwiki" title="Swedish" lang="Svenska"></div>
+    <div class="gauge" id="ukwiki" title="Ukrainian" lang="Українська"></div>
+    <br clear="left"/><hr/><!-- Special projects (multilingual) -->
+    <div class="gauge" id="wikidatawiki" title="Wikidata"></div>
+    <div class="gauge" id="mediawikiwiki" title="MediaWiki"></div>
+    <div class="gauge" id="metawiki" title="Meta"></div>
+    <div class="gauge" id="commonswiki" title="Commons"></div>
+</body>
+<script>
+<![CDATA[
+    var editsFeed = io.connect('stream.wikimedia.org/rc');  
+    var counterNodes = document.getElementsByClassName('gauge');
+    var beginTimestamp = Date.now()/1000;
+    var counterPeriod = 60; // 60 seconds --> we'll displays edits per minute
+    var editsInLastMinute = {}; // List of arrays containing the timestamps of recent edits per wiki
+    var gaugeCharts = {}; // List of charts
+
+    //##########################################################################
+    //                              SET UP CHARTS
+    //##########################################################################
+
+    // Initialize charts
+    for(i=0; i<counterNodes.length; i++) // for(elem of counterNodes) doesn't seem to work on Chrome...
+    {
+        // Initialize arrays, so we can push to them
+        editsInLastMinute[ counterNodes[i].id ] = []; 
+
+        // Set up each gauge chart, with larger units for the global one
+        scale = ( counterNodes[i].id == "global" ) ? 10 : 1;
+        gaugeCharts[ counterNodes[i].id ] = new Highcharts.Chart({
+
+            chart: {
+                type: 'gauge',
+                renderTo: counterNodes[i].id,
+            },
+            title: {
+                text: counterNodes[i].title
+            },
+            subtitle: {
+                text: counterNodes[i].lang
+            },
+            tooltip: {
+                enabled: false
+            },
+            pane: {
+                startAngle: -150,
+                endAngle: 150,
+            },
+            // The Y (value) axis. Note: a gauge chart has no X axis.
+            yAxis: {
+                min: 1*scale,
+                max: 600*scale,
+                minorTickColor: '#777',
+                minorTickInterval: 0.1,
+                tickPositions: [Math.log(1*scale)/Math.log(10),
+                                Math.log(3*scale)/Math.log(10),
+                                Math.log(6*scale)/Math.log(10),
+                                Math.log(10*scale)/Math.log(10),
+                                Math.log(30*scale)/Math.log(10),
+                                Math.log(60*scale)/Math.log(10),
+                                Math.log(100*scale)/Math.log(10),
+                                Math.log(300*scale)/Math.log(10),
+                                Math.log(600*scale)/Math.log(10)
+                               ],
+                endOnTick: true,
+                tickColor: '#666',
+                type: 'logarithmic',
+                title: scale > 1 ? { text: 'edits/min' } : null,
+                plotBands: [{
+                    from: 1*scale, // in log scale, minumum can't be zero
+                    to: 60*scale, // 1 (or 10) per second
+                    color: 'YellowGreen' // green
+                }, {
+                    from: 60*scale,
+                    to: 300*scale, // 5 (or 50) per second
+                    color: 'Gold' // yellow
+                }, {
+                    from: 300*scale,
+                    to: 600*scale, // 10 (or 100) per second
+                    color: 'Salmon' // red
+                }]
+            },
+            // only one series
+            series: [{
+                name: 'edits per minute',
+                data: [1*scale]
+            }],
+            credits: {
+                enabled: (scale != 1), // only show credits in the large gauge
+                position: {
+                    align: 'center',
+                    x: 0
+                }
+            },
+        });
+    }
+
+    //##########################################################################
+    //                       SET UP WEBSOCKET
+    //##########################################################################
+
+    editsFeed.on('connect', function() {
+        // Subscribe to one or more wikis
+        // See https://wikitech.wikimedia.org/wiki/RCStream for more details
+        editsFeed.emit('subscribe', '*');
+        console.log('WebSocket info: user connected');
+    });
+
+    editsFeed.on('change', function( changeData ) {
+        // See https://www.mediawiki.org/wiki/Manual:RCFeed#Properties
+        // Use if(changeData.type == 'edit') to count only edits, rather than all activity
+        if ( editsInLastMinute[changeData.wiki] !== undefined ) {
+            editsInLastMinute[changeData.wiki].push(changeData.timestamp);
+        }
+        if ( changeData.server_name.match("wikipedia") ) {
+            editsInLastMinute["global"].push(changeData.timestamp);
+        }
+    });
+
+    editsFeed.on('error', function( errorData ) {
+        console.log( "WebSocket error: " + JSON.stringify(errorData) );
+    });
+
+    //##########################################################################
+    //                       SET UP UPDATING ROUTINE
+    //##########################################################################
+
+    function updateCounters(){
+        now = Date.now() / 1000;
+        var elapsed = now - beginTimestamp;
+        var globalCount = 0;
+
+        for(id in editsInLastMinute) /// <--- does this work well with the global array?
+        {
+            var currentCount;
+            if( elapsed < counterPeriod) // less than counterPeriod passed since we started counting
+            {
+                currentCount = Math.round(editsInLastMinute[id].length * counterPeriod / elapsed); // extrapolate
+                if(id=="global") currentCount = Math.max(currentCount, 10); // don't allow less than 10 for the global count
+            }
+            else
+            {
+                editsInLastMinute[id] = editsInLastMinute[id].filter( function (editTimestamp) {
+                    return editTimestamp > (now - counterPeriod);
+                });
+                currentCount = editsInLastMinute[id].length;
+            }
+            if( gaugeCharts[id] != undefined )
+            {
+                // Each chart has a single series, with a single data point
+                gaugeCharts[id].series[0].points[0].update(currentCount || 1); // don't allow zero, as log(0) is mathematically undefined
+            }
+        }
+    }
+
+    // Start the update loop
+    var loopID = setInterval( updateCounters, 1000);
+
+    //##########################################################################
+    //                       CLEAN UP BEFORE EXITING
+    //##########################################################################
+    
+    window.onbeforeunload = function(){
+        editsFeed.socket.disconnect(); clearInterval(loopID);
+    };
+]]>
+</script>
+</html>
