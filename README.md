@@ -1,3 +1,6 @@
+[![Travis](https://img.shields.io/travis/waldyrious/wikispeed/gh-pages.svg)](https://travis-ci.org/waldyrious/wikispeed)
+[![Circle](https://img.shields.io/circleci/project/waldyrious/wikispeed/gh-pages.svg)](https://circleci.com/gh/waldyrious/wikispeed)
+
 # Wikispeed
 A visualization of the rate of edits to Wikipedia in various languages.
 
