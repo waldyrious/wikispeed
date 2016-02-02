@@ -16,10 +16,9 @@ for(i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to wo
     // Set up each gauge chart, with larger units for the global one
     scale = ( gaugeNodes[i].id == "global" ) ? 10 : 1;
     gaugeCharts[ gaugeNodes[i].id ] = new Highcharts.Chart({
-
         chart: {
             type: 'gauge',
-            renderTo: gaugeNodes[i].id,
+            renderTo: gaugeNodes[i].id
         },
         title: {
             text: gaugeNodes[i].title
@@ -32,7 +31,7 @@ for(i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to wo
         },
         pane: {
             startAngle: -150,
-            endAngle: 150,
+            endAngle: 150
         },
         // The Y (value) axis. Note: a gauge chart has no X axis.
         yAxis: {
@@ -50,28 +49,60 @@ for(i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to wo
                             Math.log(300*scale)/Math.log(10),
                             Math.log(600*scale)/Math.log(10)
                            ],
+            minorTickLength: 9+scale,
+            tickLength: 9+scale,
             endOnTick: true,
             tickColor: '#666',
+            labels: {
+                style: {
+                    fontSize: (scale > 1 ? 16 : 8) + 'px'
+                },
+                distance: (scale > 1 ? -40 : -20)
+            },
             type: 'logarithmic',
             title: scale > 1 ? { text: 'edits/min' } : null,
             plotBands: [{
                 from: 1*scale, // In log scale, minumum can't be zero
                 to: 60*scale, // 1 (or 10) per second
-                color: 'YellowGreen' // Green
+                color: 'YellowGreen', // Green
+                thickness: 9+scale
             }, {
                 from: 60*scale,
                 to: 300*scale, // 5 (or 50) per second
-                color: 'Gold' // Yellow
+                color: 'Gold', // Yellow
+                thickness: 9+scale
             }, {
                 from: 300*scale,
                 to: 600*scale, // 10 (or 100) per second
-                color: 'Salmon' // Red
+                color: 'Salmon', // Red
+                thickness: 9+scale
             }]
+        },
+        plotOptions: {
+            gauge: {
+                dial: {
+                    baseWidth: 10+scale,
+                    topWidth: 1,
+                    baseLength: '0%', // location along radius where it starts narrowing
+                    rearLength: '0%' // don't project back, start at center
+                },
+                pivot: {
+                    radius: (10+scale)/2
+                }
+            }
         },
         // Only one data series, initialized with the minimum allowed value
         series: [{
             name: 'edits per minute',
-            data: [1*scale]
+            data: [1*scale],
+            dataLabels: {
+                backgroundColor: 'white',
+                y: -15,
+                style: {
+                    fontSize: (scale > 1 ? 30 : 15) + 'px'
+                },
+                zIndex: 3
+            }
         }],
         credits: {
             enabled: (scale != 1), // Only show credits in the large gauge
@@ -79,7 +110,7 @@ for(i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to wo
                 align: 'center',
                 x: 0
             }
-        },
+        }
     });
 }
 
