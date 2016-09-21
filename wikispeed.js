@@ -8,13 +8,13 @@ var gaugeCharts = {}; // List of charts
 //##########################################################################
 //                              SET UP CHARTS
 //##########################################################################
-for(i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to work on Chrome...
+for(var i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem to work on Chrome...
 {
     // Initialize arrays, so we can push to them
     editsInLastMinute[ gaugeNodes[i].id ] = [];
 
     // Set up each gauge chart, with larger units for the global one
-    scale = ( gaugeNodes[i].id == "global" ) ? 10 : 1;
+    var scale = ( gaugeNodes[i].id == "global" ) ? 10 : 1;
     gaugeCharts[ gaugeNodes[i].id ] = new Highcharts.Chart({
         chart: {
             type: 'gauge',
@@ -148,10 +148,10 @@ editsFeed.on('error', function( errorData ) {
 //##############################################################################
 
 function updateCounters(){
-    now = Date.now() / 1000;
+    var now = Date.now() / 1000;
     var elapsed = now - beginTimestamp;
 
-    for(id in editsInLastMinute)
+    for(var id in editsInLastMinute)
     {
         var currentCount;
         if( elapsed < counterPeriod)
@@ -173,7 +173,7 @@ function updateCounters(){
         {
             // Each chart has a single series, with a single data point.
             // Note: zero is not allowed, as log(0) is mathematically undefined
-            min = ( id == "global" ) ? 10 : 1;
+            var min = ( id == "global" ) ? 10 : 1;
             gaugeCharts[id].series[0].points[0].update( Math.max(min, currentCount) ); 
         }
     }
