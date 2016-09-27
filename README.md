@@ -4,7 +4,7 @@
 # Wikispeed
 A visualization of the rate of edits to Wikipedia in various languages.
 
-It's essentially a replica of the original **[Wikipulse](http://wikipulse.herokuapp.com)**,
+This is essentially a replica of the original **[Wikipulse](http://wikipulse.herokuapp.com)**,
 created in 2011 by [Ed Summers](http://mith.umd.edu/people/person/ed-summers/),
 but using the new [Recent Changes stream](https://www.mediawiki.org/wiki/API:Recent_changes_stream)
 over [websockets](https://en.wikipedia.org/wiki/WebSocket), instead of the old
