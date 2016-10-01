@@ -1,6 +1,7 @@
 ## The [ISC License](http://opensource.org/licenses/ISC)
 
-Copyright (c) 2016, Waldir Pimenta
+Copyright (c) 2016, Waldir Pimenta and [contributors]
+(https://github.com/waldyrious/wikispeed/graphs/contributors)
 
 Permission to use, copy, modify, and/or distribute this software
 for any purpose with or without fee is hereby granted,
