@@ -1,4 +1,4 @@
-var editsFeed = io.connect('stream.wikimedia.org/rc');  
+var editsFeed = io.connect('stream.wikimedia.org/rc');
 var gaugeNodes = document.getElementsByClassName('gauge');
 var beginTimestamp = Date.now()/1000;
 var counterPeriod = 60; // 60 seconds --> we'll displays edits per minute
@@ -24,7 +24,7 @@ for(var i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem t
             text: gaugeNodes[i].title
         },
         subtitle: {
-            text: gaugeNodes[i].lang
+            text: gaugeNodes[i].dataset.lang
         },
         tooltip: {
             enabled: false
@@ -174,7 +174,7 @@ function updateCounters(){
             // Each chart has a single series, with a single data point.
             // Note: zero is not allowed, as log(0) is mathematically undefined
             var min = ( id == "global" ) ? 10 : 1;
-            gaugeCharts[id].series[0].points[0].update( Math.max(min, currentCount) ); 
+            gaugeCharts[id].series[0].points[0].update( Math.max(min, currentCount) );
         }
     }
 }
