@@ -32,6 +32,7 @@ hr
         rgba(200, 200, 200, 1) 25%,
         rgba(200, 200, 200, 1) 75%,
         rgba(200, 200, 200, 0) 100%);
+    clear: left;
 }
 
 .gauge
@@ -47,4 +48,4 @@ hr
 {
     width: 30rem;
     height: 31rem;
-} 
+}
