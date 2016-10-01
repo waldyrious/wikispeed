@@ -1,5 +1,19 @@
-[![Travis](https://img.shields.io/travis/waldyrious/wikispeed/gh-pages.svg)](https://travis-ci.org/waldyrious/wikispeed)
-[![Circle](https://img.shields.io/circleci/project/waldyrious/wikispeed/gh-pages.svg)](https://circleci.com/gh/waldyrious/wikispeed)
+[![travis][travis-img]][travis-url]
+[![circle][circle-img]][circle-url]
+[![issues][issues-img]][issues-url]
+[![license][license-img]][license-url]
+[![validation][validation-img]][validation-url]
+
+[travis-url]: https://travis-ci.org/waldyrious/wikispeed
+[travis-img]: https://img.shields.io/travis/waldyrious/wikispeed/gh-pages.svg?label=travis%20build
+[circle-url]: https://circleci.com/gh/waldyrious/wikispeed
+[circle-img]: https://img.shields.io/circleci/project/waldyrious/wikispeed/gh-pages.svg?label=circleci%20build
+[issues-url]: https://github.com/waldyrious/wikispeed/issues
+[issues-img]: http://img.shields.io/github/issues/waldyrious/wikispeed.svg
+[license-url]: https://github.com/waldyrious/wikispeed/blob/gh-pages/LICENSE.md
+[license-img]: https://img.shields.io/github/license/waldyrious/wikispeed.svg
+[validation-url]: https://validator.w3.org/nu/?doc=http%3A%2F%2Fwaldyrious.net%2Fwikispeed%2F
+[validation-img]: https://img.shields.io/badge/w3c-valid_xhtml5-blue.svg
 
 # Wikispeed
 A visualization of the rate of edits to Wikipedia in various languages.
