@@ -1,3 +1,5 @@
+# Wikispeed
+
 [![travis][travis-img]][travis-url]
 [![circle][circle-img]][circle-url]
 [![issues][issues-img]][issues-url]
@@ -15,7 +17,6 @@
 [validation-url]: https://validator.w3.org/nu/?doc=http%3A%2F%2Fwaldyrious.net%2Fwikispeed%2F
 [validation-img]: https://img.shields.io/badge/w3c-valid_xhtml5-blue.svg
 
-# Wikispeed
 A visualization of the rate of edits to Wikipedia in various languages.
 
 This is essentially a replica of the original **[Wikipulse](http://wikipulse.herokuapp.com)**,
