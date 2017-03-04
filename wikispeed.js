@@ -13,8 +13,12 @@ for(var i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem t
     // Initialize arrays, so we can push to them
     editsInLastMinute[ gaugeNodes[i].id ] = [];
 
-    // Set up each gauge chart, with larger limits for the global and wikidata ones
-    var scale = ( gaugeNodes[i].id == "global" || gaugeNodes[i].id == "wikidatawiki") ? 10 : 1;
+    // Use larger limits for the global and wikidata charts
+    var scaleRatio = ( gaugeNodes[i].id == "global" || gaugeNodes[i].id == "wikidatawiki" ) ? 10 : 1;
+    // Use larger element sizes for the global chart
+    var extraSize = ( gaugeNodes[i].id == "global" ) ? 10 : 1;
+
+    // Set up the gauge charts
     gaugeCharts[ gaugeNodes[i].id ] = new Highcharts.Chart({
         chart: {
             type: 'gauge',
@@ -35,77 +39,77 @@ for(var i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem t
         },
         // The Y (value) axis. Note: a gauge chart has no X axis.
         yAxis: {
-            min: 1*scale,
-            max: 600*scale,
+            min: 1*scaleRatio,
+            max: 600*scaleRatio,
             minorTickColor: '#777',
             minorTickInterval: 0.1,
-            tickPositions: [Math.log(1*scale)/Math.log(10),
-                            Math.log(3*scale)/Math.log(10),
-                            Math.log(6*scale)/Math.log(10),
-                            Math.log(10*scale)/Math.log(10),
-                            Math.log(30*scale)/Math.log(10),
-                            Math.log(60*scale)/Math.log(10),
-                            Math.log(100*scale)/Math.log(10),
-                            Math.log(300*scale)/Math.log(10),
-                            Math.log(600*scale)/Math.log(10)
+            tickPositions: [Math.log(1*scaleRatio)/Math.log(10),
+                            Math.log(3*scaleRatio)/Math.log(10),
+                            Math.log(6*scaleRatio)/Math.log(10),
+                            Math.log(10*scaleRatio)/Math.log(10),
+                            Math.log(30*scaleRatio)/Math.log(10),
+                            Math.log(60*scaleRatio)/Math.log(10),
+                            Math.log(100*scaleRatio)/Math.log(10),
+                            Math.log(300*scaleRatio)/Math.log(10),
+                            Math.log(600*scaleRatio)/Math.log(10)
                            ],
-            minorTickLength: 9+scale,
-            tickLength: 9+scale,
+            minorTickLength: 9+extraSize,
+            tickLength: 9+extraSize,
             endOnTick: true,
             tickColor: '#666',
             labels: {
                 style: {
-                    fontSize: (scale > 1 ? 16 : 8) + 'px'
+                    fontSize: (extraSize > 1 ? 16 : 8) + 'px'
                 },
-                distance: (scale > 1 ? -40 : -20)
+                distance: (extraSize > 1 ? -40 : -20)
             },
             type: 'logarithmic',
-            title: scale > 1 ? { text: 'edits/min' } : null,
+            title: extraSize > 1 ? { text: 'edits/min' } : null,
             plotBands: [{
-                from: 1*scale, // In log scale, minumum can't be zero
-                to: 60*scale, // 1 (or 10) per second
+                from: 1*scaleRatio, // In log scale, minumum can't be zero
+                to: 60*scaleRatio, // 1 (or 10) per second
                 color: 'YellowGreen', // Green
-                thickness: 9+scale
+                thickness: 9+extraSize
             }, {
-                from: 60*scale,
-                to: 300*scale, // 5 (or 50) per second
+                from: 60*scaleRatio,
+                to: 300*scaleRatio, // 5 (or 50) per second
                 color: 'Gold', // Yellow
-                thickness: 9+scale
+                thickness: 9+extraSize
             }, {
-                from: 300*scale,
-                to: 600*scale, // 10 (or 100) per second
+                from: 300*scaleRatio,
+                to: 600*scaleRatio, // 10 (or 100) per second
                 color: 'Salmon', // Red
-                thickness: 9+scale
+                thickness: 9+extraSize
             }]
         },
         plotOptions: {
             gauge: {
                 dial: {
-                    baseWidth: 10+scale,
+                    baseWidth: 10+extraSize,
                     topWidth: 1,
                     baseLength: '0%', // location along radius where it starts narrowing
                     rearLength: '0%' // don't project back, start at center
                 },
                 pivot: {
-                    radius: (10+scale)/2
+                    radius: (10+extraSize)/2
                 }
             }
         },
         // Only one data series, initialized with the minimum allowed value
         series: [{
             name: 'edits per minute',
-            data: [1*scale],
+            data: [1*scaleRatio],
             dataLabels: {
                 backgroundColor: 'white',
                 y: -15,
                 style: {
-                    fontSize: (scale > 1 ? 30 : 15) + 'px'
+                    fontSize: (extraSize > 1 ? 30 : 15) + 'px'
                 },
                 zIndex: 3
             }
         }],
         credits: {
-            enabled: (scale != 1), // Only show credits in the large gauge
+            enabled: (extraSize != 1), // Only show credits in the large gauge
             position: {
                 align: 'center',
                 x: 0
