@@ -13,8 +13,8 @@ for(var i=0; i<gaugeNodes.length; i++) // for(elem of gaugeNodes) doesn't seem t
     // Initialize arrays, so we can push to them
     editsInLastMinute[ gaugeNodes[i].id ] = [];
 
-    // Set up each gauge chart, with larger units for the global one
-    var scale = ( gaugeNodes[i].id == "global" ) ? 10 : 1;
+    // Set up each gauge chart, with larger limits for the global and wikidata ones
+    var scale = ( gaugeNodes[i].id == "global" || gaugeNodes[i].id == "wikidatawiki") ? 10 : 1;
     gaugeCharts[ gaugeNodes[i].id ] = new Highcharts.Chart({
         chart: {
             type: 'gauge',
